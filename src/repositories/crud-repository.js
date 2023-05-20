@@ -4,6 +4,8 @@
 // This curd file will handle all the crud operations by creating utility func
 // This will help to segregate the logic and crud op
 
+// service -> Repo
+
 const { Logger } = require('../config')
 
 class CrudRepository {
@@ -14,15 +16,8 @@ class CrudRepository {
     // 1. create funtion
     // data -> object => {name, id, data,...}
     async create(data) {
-        try {
-            const response = await this.model.create(data);
-            // console.log("response", response);
-            return response;
-
-        } catch (error) {
-            Logger.error('Someting went wrong in the CRUD repo : create fun')
-            throw error;
-        }
+        const response = await this.model.create(data);
+        return response;
     }
 
     // 2. delete from table -> destoy
