@@ -38,7 +38,24 @@ async function getAirplanes() {
         throw new AppError('Cannot fetch data of all the airplanes', StatusCodes.INTERNAL_SERVER_ERROR);
     }
 }
+
+// get a single airplane bt giving primary key to indentify the airplane tupple
+async function getAirplane(id) {
+    try {
+        // fetches all the airplanes from the database
+        const airplane = await airplaneRepository.get(id);
+        return airplane;
+
+    } catch (error) {
+        if (error.statusCode == StatusCodes.NOT_FOUND) {
+            throw new AppError('The Requested airplane not found', error.statusCode);
+        }
+        // the most probable error -> not able to connect to db
+        throw new AppError('Cannot fetch data of the airplane', StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+}
 module.exports = {
     createAirplane,
-    getAirplanes
+    getAirplanes,
+    getAirplane
 }; 
