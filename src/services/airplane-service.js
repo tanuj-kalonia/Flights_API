@@ -54,8 +54,52 @@ async function getAirplane(id) {
         throw new AppError('Cannot fetch data of the airplane', StatusCodes.INTERNAL_SERVER_ERROR);
     }
 }
+
+// delete an airplane
+async function destroyAirplane(id) {
+    try {
+        // fetches all the airplanes from the database
+        const airplane = await airplaneRepository.destroy(id);
+        return airplane;
+
+    } catch (error) {
+        if (error.statusCode == StatusCodes.NOT_FOUND) {
+            throw new AppError('The Requested airplane can not be deleted', error.statusCode);
+        }
+        // the most probable error -> not able to connect to db
+        throw new AppError('Cannot fetch data of the airplane', StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+}
+
+// update an airplane
+async function updateAirplane(id, data) {
+    try {
+        // fetches all the airplanes from the database
+        const airplane = await airplaneRepository.update(id, data);
+        return airplane;
+
+    } catch (error) {
+        // Input not given or plane not found
+        if (error.statusCode === StatusCodes.BAD_REQUEST || error.statusCode == StatusCodes.NOT_FOUND) {
+            throw new AppError(error.explanation, error.statusCode);
+        }
+
+        // if capacity excessds the limit
+        if (error.name === 'SequelizeValidationError') {
+            let explanation = [];
+            error.errors.forEach(err => {
+                explanation.push(err.message);
+            })
+            throw new AppError(explanation, StatusCodes.BAD_REQUEST);
+        }
+        // the most probable error -> not able to connect to db
+        throw new AppError('Cannot fetch data of the airplane', StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+}
 module.exports = {
     createAirplane,
     getAirplanes,
-    getAirplane
+    getAirplane,
+    destroyAirplane,
+    updateAirplane
 }; 

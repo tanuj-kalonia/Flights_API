@@ -7,7 +7,7 @@
 // service -> Repo
 
 const { StatusCodes } = require('http-status-codes');
-const { Logger } = require('../config');
+const { Logger } = require('../config')
 const AppError = require('../utils/errors/app-error');
 
 class CrudRepository {
@@ -28,6 +28,9 @@ class CrudRepository {
         const response = await this.model.destroy({
             where: { id: data } // delete from table where id = 'data'
         });
+        if (!response) {
+            throw new AppError('Not able to find the resource', StatusCodes.NOT_FOUND);
+        }
         return response;
 
     }
@@ -40,7 +43,6 @@ class CrudRepository {
             throw new AppError('Not able to find the requested Data', StatusCodes.NOT_FOUND);
         }
         return response;
-
     }
 
     // 4. get the entire table
@@ -52,12 +54,19 @@ class CrudRepository {
     // 5. Update the table
     // Update the user data with the given data who have this id;
     async update(id, data) {
+        if (JSON.stringify(data) === '{}') {
+            throw new AppError('The input data is not a valid input', StatusCodes.BAD_REQUEST);
+        }
+
         const response = await this.model.update(data, {
-            where: {
-                id: id
-            }
+            where: { id: id }
         });  // return an array of all the tupples
+        if (!response[0])
+            throw new AppError('The airplane to be updated not found', StatusCodes.NOT_FOUND);
+
         return response;
+
+
     }
 }
 

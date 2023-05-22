@@ -66,8 +66,46 @@ async function getAirplane(req, res) {
             .json(ErrorResponse)
     }
 }
+
+/// delete : /api/v1/airplanes/:id
+async function destroyAirplane(req, res) {
+    try {
+        const airplane = await AirplaneService.destroyAirplane(req.params.id);
+
+        SuccessResponse.data = airplane;
+        return res
+            .status(StatusCodes.OK)
+            .json(SuccessResponse);
+
+    } catch (error) {
+        ErrorResponse.error = error;
+        return res
+            .status(error.statusCode)   // from AppError
+            .json(ErrorResponse)
+    }
+}
+async function updateAirplane(req, res) {
+    try {
+        const data = req.body;
+
+        const airplane = await AirplaneService.updateAirplane(req.params.id, data);
+
+        SuccessResponse.data = airplane;
+        return res
+            .status(StatusCodes.OK)
+            .json(SuccessResponse);
+
+    } catch (error) {
+        ErrorResponse.error = error;
+        return res
+            .status(error.statusCode)   // from AppError
+            .json(ErrorResponse)
+    }
+}
 module.exports = {
     createAirplane,
     getAirplanes,
     getAirplane,
+    destroyAirplane,
+    updateAirplane
 }
