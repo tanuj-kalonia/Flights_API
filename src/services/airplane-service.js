@@ -47,7 +47,7 @@ async function getAirplane(id) {
         return airplane;
 
     } catch (error) {
-        if (error.statusCode == StatusCodes.NOT_FOUND) {
+        if (error.statusCode === StatusCodes.NOT_FOUND) {
             throw new AppError('The Requested airplane not found', error.statusCode);
         }
         // the most probable error -> not able to connect to db
