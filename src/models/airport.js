@@ -10,7 +10,25 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      // This fun gives js level constriaints to be applied on the db
+      // We can tell the association -> one => many or many => one or many => many level
+
+      // airport belongs to city
+      this.belongsTo(models.City, {
+        foreignKey: 'cityId',
+        onDelete: 'CASCADE',
+        onDelete: 'CASCADE'
+      });
+
+      // airport has many flights
+      this.hasMany(models.Flight, {
+        foreignKey: 'departureAirportId',
+        onDelete: 'CASCADE'
+      });
+      this.hasMany(models.Flight, {
+        foreignKey: 'arrivalAirportId',
+        onDelete: 'CASCADE'
+      })
     }
   }
   Airport.init({
