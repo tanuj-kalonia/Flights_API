@@ -12,7 +12,8 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // city can have many airports 
       this.hasMany(models.Airport, {
-
+        foreignKey: 'cityId',
+        onDelete: 'CASCADE',
       })
     }
   }

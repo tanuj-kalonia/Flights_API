@@ -80,6 +80,7 @@ async function updateAirport(id, data) {
 
     } catch (error) {
         // Input not given or plane not found
+        console.log(error);
         if (error.statusCode === StatusCodes.BAD_REQUEST || error.statusCode == StatusCodes.NOT_FOUND) {
             throw new AppError(error.explanation, error.statusCode);
         }
