@@ -1,5 +1,6 @@
+const { Sequelize } = require('sequelize');
 const CrudRepository = require('./crud-repository');
-const { Flight } = require('../models');
+const { Flight, Airplane, Airport, City } = require('../models');
 
 class FlightRepository extends CrudRepository {
     constructor() {
@@ -10,11 +11,69 @@ class FlightRepository extends CrudRepository {
     async getAllFlights(filter, sort) {
         const response = await Flight.findAll({
             where: filter,
-            order: sort
+            order: sort,
+            include: [
+                {
+                    model: Airplane,
+                    required: true,
+                    as: 'airplaneDetail',
+                },
+                {
+                    model: Airport,
+                    required: true,
+                    as: 'departureAirport',
+                    on: {
+                        col1: Sequelize.where(Sequelize.col("Flight.departureAirportId"), "=", Sequelize.col("departureAirport.code"))
+                    },
+                    include: {
+                        model: City,
+                        required: true
+                    }
+                },
+                {
+                    model: Airport,
+                    required: true,
+                    as: 'arrivalAirport',
+                    on: {
+                        col1: Sequelize.where(Sequelize.col("Flight.arrivalAirportId"), "=", Sequelize.col("arrivalAirport.code"))
+                    },
+                    include: {
+                        model: City,
+                        required: true
+                    }
+                }
+            ]
         })
         return response;
     }
 
 }
+
+/* 
+    With the above filter and sort filter, we are getting the following response
+
+    "data": [
+        {
+            "id": 8,
+            "flightNumber": "DL-324",
+            "airplaneId": 3,
+            "departureAirportId": "DEL",
+            "arrivalAirportId": "BLR",
+            "arrivalTime": "2023-05-28T14:00:00.000Z",
+            "departureTime": "2023-05-28T11:30:00.000Z",
+            "price": 1500,
+            "boardingGate": null,
+            "totalSeats": 457,
+            "createdAt": "2023-05-27T07:34:19.000Z",
+            "updatedAt": "2023-05-27T07:34:19.000Z"
+        }
+    ]
+    In the above response, we are only getting departure,arrival,city id. We are not getting threir individual details.
+    We also want to inculde the departure, arrival airport along with city.
+
+    To do so, we wish to inculude their details from their respective tabes, hence we need to join the tables
+    To join tables in sequelize, we need to use the 'inculde' keyword which is an array of tables we wish to join on
+    
+*/
 
 module.exports = FlightRepository;

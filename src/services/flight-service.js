@@ -29,7 +29,7 @@ async function createFlight(data) {
 
 async function getAllFlights(query) {
     let customFilter = {};
-    let customSortFilter = {};
+    let customSortFilter = [];
     // trips = BOM-DEL
     if (query.trips) {
         // [departureAirportId, arrivalAirportId]  = [BOM,DEL]
