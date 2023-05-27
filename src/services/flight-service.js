@@ -6,6 +6,7 @@
 const { StatusCodes } = require('http-status-codes');
 const { FlightRepository } = require('../repositories');
 const AppError = require('../utils/errors/app-error')
+const { Op } = require('sequelize');
 
 const flightRepository = new FlightRepository();
 
@@ -26,7 +27,60 @@ async function createFlight(data) {
     }
 }
 
+async function getAllFlights(query) {
+    let customFilter = {};
+    let customSortFilter = {};
+    // trips = BOM-DEL
+    if (query.trips) {
+        // [departureAirportId, arrivalAirportId]  = [BOM,DEL]
+        [departureAirportId, arrivalAirportId] = query.trips.split("-");
+        customFilter.departureAirportId = departureAirportId;
+        customFilter.arrivalAirportId = arrivalAirportId;
+    }
+    // Price filter => price = min-max
+    if (query.price) {
+        let upperPriceLimit = 20000;
+        [minPrice, maxPrice] = query.price.split("-");
+        if (maxPrice == undefined) {
+            maxPrice = upperPriceLimit
+        }
+        customFilter.price = {
+            [Op.between]: [minPrice, maxPrice]
+        }
+    }
+
+    // trvellers
+    if (query.travellers) {
+        customFilter.totalSeats = {
+            [Op.gte]: query.travellers
+        }
+    }
+
+    // date filter
+    if (query.tripDate) {
+        let endingDateTime = " 23:59:59";
+        customFilter.departureTime = {
+            [Op.between]: [query.tripDate, query.tripDate + endingDateTime]
+        }
+    }
+
+    // sort filter - &sort=price_ASC,departureTime_DESC
+    if (query.sort) {
+        const params = query.sort.split(","); // array of diffrent sorts paramters - [price_ASC, departureTime_DESC]
+        const sortFilters = params.map(param => param.split("_")) // array of sort filter - [[price,ASC], [departureTime,DESC]]
+        customSortFilter = sortFilters
+    }
+    try {
+        const flights = await flightRepository.getAllFlights(customFilter, customSortFilter);
+        return flights;
+
+    } catch (error) {
+        console.log(error);
+        throw new AppError('Cannot Fetch all the flights', StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+}
 
 module.exports = {
-    createFlight
+    createFlight,
+    getAllFlights
 }; 

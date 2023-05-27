@@ -4,7 +4,7 @@ const AppError = require('../utils/errors/app-error');
 const { DateTimeHelper } = require('../utils/helpers');
 
 function validateCreateRequest(req, res, next) {
-    // console.log(req.body);
+    console.log(req.body);
     if (!req.body.flightNumber) {
         ErrorResponse.message = "Something went wrong while creating airport";
         ErrorResponse.error = new AppError(["The parameter 'flightNumber' is in wrong formate(or not passed), please ractify!!"], StatusCodes.BAD_REQUEST)
