@@ -22,6 +22,8 @@ class FlightRepository extends CrudRepository {
                     model: Airport,
                     required: true,
                     as: 'departureAirport',
+                    // on is used to join on custom col
+                    // by default, it joins on the id property of the model used
                     on: {
                         col1: Sequelize.where(Sequelize.col("Flight.departureAirportId"), "=", Sequelize.col("departureAirport.code"))
                     },
