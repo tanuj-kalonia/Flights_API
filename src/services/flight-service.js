@@ -80,7 +80,23 @@ async function getAllFlights(query) {
     }
 }
 
+async function getFlight(id) {
+    try {
+        // fetches all the airports from the database
+        const flight = await flightRepository.get(id);
+        return flight;
+
+    } catch (error) {
+        if (error.statusCode == StatusCodes.NOT_FOUND) {
+            throw new AppError('The Requested flight not found', error.statusCode);
+        }
+        // the most probable error -> not able to connect to db
+        throw new AppError('Cannot fetch data of the flight', StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+}
+
 module.exports = {
     createFlight,
-    getAllFlights
+    getAllFlights,
+    getFlight
 }; 

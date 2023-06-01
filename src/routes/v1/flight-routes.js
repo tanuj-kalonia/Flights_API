@@ -14,4 +14,7 @@ router.post('/',
 // /api/v1/flights?queeries
 router.get('/', FlightController.getAllFlights)
 
+// / api / v1 / flights / : id -> get
+router.get('/:id', FlightController.getFlight)
+
 module.exports = router;
